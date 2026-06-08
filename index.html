@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stride +</title>
+    <link rel="icon" type="image/svg" href="icon-t.svg">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: sans-serif;
+        }
+        
+        #rjt {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 25px;
+            border: none;
+            background-color: rgb(0, 102, 255);
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            transition: 0.4s;
+            transform: scale(1.05);
+        }
+        
+        #rjt:active {
+            transform: scale(0.85);
+            background-color: rgb(24, 132, 255);
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            height: 65px;
+            width: 100vw;
+            right: 0px;
+            left: 0px;
+            bottom: 0px;
+            background-color: #1884ff;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            
+            display: flex;
+            justify-content: space-around; 
+            align-items: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        
+        .nav-item {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            opacity: 0.75;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+        }
+
+        .nav-item:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+
+        /* --- STYLE PAGES --- */
+        .page-content {
+            padding: 20px;
+            font-size: 20px;
+            text-align: center;
+            margin-top: 20px;
+            box-sizing: border-box;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.visible {
+            display: block;
+        }
+
+        /* --- STYLES ACCUEIL --- */
+        .welcome-header h1 {
+            margin-bottom: 5px;
+            color: #111;
+        }
+        
+        .welcome-header p {
+            margin-top: 0;
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Bloc Priorité global */
+        .priority-box {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            text-align: left;
+            max-width: 260px;
+        }
+
+        .priority-box h4 {
+            margin: 0 0 8px 0;
+            color: rgb(24, 132, 255);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-input-wrapper {
+            display: flex;
+            gap: 5px;
+        }
+
+        #priority-input {
+            flex-grow: 1;
+            border: none;
+            background: #f2f2f7;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #btn-save-priority {
+            background-color: rgb(24, 132, 255);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        #btn-save-priority:hover {
+            background-color: rgb(0, 102, 255);
+        }
+
+        /* Container des Statistiques */
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            flex: 1;
+            padding: 20px 10px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1884ff;
+        }
+
+        .stat-card.done .stat-number {
+            color: #34c759;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* --- LISTE DE TÂCHES --- */
+        .task-container {
+            padding: 20px;
+            margin-top: 65px;
+            height: calc(100% - 90px);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .task-container h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+
+        #task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .task-item {
+            background: white;
+            padding: 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            animation: fadeIn 0.3s ease;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item span {
+            font-size: 16px;
+            color: #333;
+            flex-grow: 1;
+            transition: all 0.3s ease;
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            color: #8e8e93;
+        }
+        
+        .task-item.completed {
+            opacity: 0.6;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 5px;
+            transition: transform 0.2s;
+        }
+
+        .btn-delete:hover {
+            transform: scale(1.2);
+        }
+
+        /* Checkbox style */
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgb(0, 102, 255);
+            background-color: white; 
+            cursor: pointer;
+            margin-right: 12px;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: red;
+            border-color: red;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div id="page-accueil" class="page page-content">
+            <div class="welcome-header">
+                <p>Voici le point sur vos objectifs.</p>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-number" id="taches-restantes">0</span>
+                    <span class="stat-label">À faire</span>
+                </div>
+                <div class="stat-card done">
+                    <span class="stat-number" id="taches-faites">0</span>
+                    <span class="stat-label">Terminées</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-taches" class="page visible">
+            <div class="page-content" style="text-align: left; padding-bottom: 0; margin-top: 10px;">
+                
+                <p style="color: #666; font-size: 16px; margin-top: 0; position: fixed; left: 50%; transform: translate(-50%);">Définis tes tâches</p>
+            </div>
+
+            <div class="gstn" style="height: 68vh;">
+                <button id="rjt">+</button>
+                
+                <div class="task-container" style="margin-top: 65px; height: calc(100% - 85px);">
+                    <ul id="task-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-profil" class="page page-content">
+            <p style="color: #666; font-size: 16px;">Définis ton objectif principal</p>
+            
+            <div class="priority-box" style="margin-top: 40px;">
+                <h4>priorité du jour</h4>
+                <div class="priority-input-wrapper">
+                    <input type="text" id="priority-input" placeholder="priorité du jour...">
+                    <button id="btn-save-priority"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM565-275q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z"/></svg></button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <nav>
+        <button class="nav-item" data-target="page-accueil">
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#FFFFFF"><path d="M160-120v-480l320-240 320 240v480H560v-240H400v240H160Zm80-80h80v-240h240v240h80v-400L480-740 240-560v360Zm240-180Z"/></svg>
+        </button>
+
+        <button class="nav-item active" data-target="page-taches">
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#FFFFFF"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm221.5-198.5Q510-807 510-820t-8.5-21.5Q493-850 480-850t-21.5 8.5Q450-833 450-820t8.5 21.5Q467-790 480-790t21.5-8.5ZM200-200v-560 560Z"/></svg>
+        </button>
+
+        <button class="nav-item" data-target="page-profil">
+            <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M565.5-348.5Q603-377 620-422H340q17 45 54.5 73.5T480-320q48 0 85.5-28.5Zm-143-149Q440-515 440-540t-17.5-42.5Q405-600 380-600t-42.5 17.5Q320-565 320-540t17.5 42.5Q355-480 380-480t42.5-17.5Zm200 0Q640-515 640-540t-17.5-42.5Q605-600 580-600t-42.5 17.5Q520-565 520-540t17.5 42.5Q555-480 580-480t42.5-17.5ZM306.22-701.88l115.45-149.79q11.33-14.66 26.55-21.83 15.23-7.17 31.84-7.17t31.77 7.17q15.17 7.17 26.5 21.83l115.45 149.79L829-643q24 8 37.67 27.91 13.66 19.9 13.66 43.98 0 11.11-3.19 22.2-3.18 11.08-10.47 21.24L754-367l4 170q.33 32.33-21.67 54.67-22 22.33-52.11 22.33-1.89 0-19.89-3L480-174.33l-184.19 51.28q-5.14 2.05-10.82 2.55-5.67.5-10.4.5-30.26 0-51.92-22.46Q201-164.92 202-197.67l4-170.5L93.67-528.33q-7.29-10.22-10.48-21.37Q80-560.85 80-572q0-23.67 13.45-43.24Q106.89-634.81 131-643l175.22-58.88Zm40.45 57.55-204 68 130.66 189-4.66 201.66L480-244l211.33 59.33-4.66-202.66 130.66-187-204-70L480-818 346.67-644.33Zm133.33 143Z"/></svg>
+        </button>
+    </nav>
+
+    <div class="load" style="
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh; 
+    background-color: #0b1320;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 9999999999;
+    transition: opacity 0.4s ease;
+">
+    <img src="studio.png" style="max-width: 250px; height: auto;">
+</div>
+
+    <script>
+        window.addEventListener('load', () => {
+    // 1. On sélectionne correctement la classe avec le point "."
+    const loader = document.querySelector(".load");
+
+    // 2. Optionnel : On ajoute une transition de fondu pour faire plus pro
+    loader.style.opacity = '0';
+
+    // 3. On attend la fin de l'effet visuel (400ms) pour masquer complètement le bloc
+    setTimeout(() => {
+        loader.style.display = 'none';
+    }, 400); 
+});
+        // --- 1. SCRIPT DE NAVIGATION ---
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelector('.nav-item.active').classList.remove('active');
+                item.classList.add('active');
+                const targetPageId = item.getAttribute('data-target');
+                document.querySelector('.page.visible').classList.remove('visible');
+                document.getElementById(targetPageId).classList.add('visible');
+            });
+        });
+
+        // --- 2. SCRIPT DE GESTION DES TÂCHES ---
+        const btnAjouter = document.getElementById('rjt');
+        const listeTaches = document.getElementById('task-list');
+
+        const txtRestantes = document.getElementById('taches-restantes');
+        const txtFaites = document.getElementById('taches-faites');
+
+        const priorityInput = document.getElementById('priority-input');
+        const btnSavePriority = document.getElementById('btn-save-priority');
+
+        // Récupération des données mémorisées
+        let tableauTaches = JSON.parse(localStorage.getItem('mesTaches')) || [];
+        
+        // Charger la priorité initiale dans l'input (situé sur l'onglet Profil désormais)
+        const prioriteSauvegardee = localStorage.getItem('maPriorite') || "";
+        priorityInput.value = prioriteSauvegardee;
+
+        // Affichage des tâches
+        tableauTaches.forEach(objTache => {
+            if (typeof objTache === 'string') {
+                objTache = { texte: objTache, coche: false };
+            }
+            creerElementTacheHTML(objTache.texte, objTache.coche);
+        });
+        
+        tableauTaches = tableauTaches.map(t => typeof t === 'string' ? { texte: t, coche: false } : t);
+        sauvegarderDansLocalStorage();
+        mettreAJourStats();
+
+        // Enregistrement de la priorité depuis l'onglet profil
+        btnSavePriority.addEventListener('click', () => {
+            const valeurPriorite = priorityInput.value.trim();
+            localStorage.setItem('maPriorite', valeurPriorite);
+            alert("Priorité enregistrée");
+        });
+
+        btnAjouter.addEventListener('click', () => {
+    // Vérification de la limite de 5 tâches
+    if (tableauTaches.length >= 5) {
+        alert("Limite atteinte ! Vous ne pouvez pas ajouter plus de 5 tâches dans la version gratuite. Passez à la version Premium pour un accès illimité.");
+        return; // Bloque la suite de l'exécution
+    }
+
+    const texteTache = prompt("Quelle tâche souhaitez-vous ajouter ?");
+
+    if (texteTache && texteTache.trim() !== "") {
+        const textePropre = texteTache.trim();
+        
+        creerElementTacheHTML(textePropre, false);
+        tableauTaches.push({ texte: textePropre, coche: false });
+        
+        sauvegarderDansLocalStorage();
+        mettreAJourStats();
+    }
+});
+        function creerElementTacheHTML(texte, estCoche) {
+            const li = document.createElement('li');
+            li.classList.add('task-item');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = estCoche;
+
+            if (estCoche) {
+                li.classList.add('completed');
+            }
+
+            checkbox.addEventListener('change', () => {
+                const tacheModifiee = tableauTaches.find(t => t.texte === texte);
+                
+                if (checkbox.checked) {
+                    li.classList.add('completed');
+                    if (tacheModifiee) tacheModifiee.coche = true;
+                } else {
+                    li.classList.remove('completed');
+                    if (tacheModifiee) tacheModifiee.coche = false;
+                }
+                
+                sauvegarderDansLocalStorage();
+                mettreAJourStats();
+            });
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = texte;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '✕';
+            deleteBtn.classList.add('btn-delete');
+
+            deleteBtn.addEventListener('click', () => {
+                li.remove();
+                tableauTaches = tableauTaches.filter(t => t.texte !== texte);
+                sauvegarderDansLocalStorage();
+                mettreAJourStats();
+            });
+
+            li.appendChild(checkbox);
+            li.appendChild(textSpan);
+            li.appendChild(deleteBtn);
+            
+            listeTaches.appendChild(li);
+        }
+
+        function mettreAJourStats() {
+            const totalFaites = tableauTaches.filter(t => t.coche === true).length;
+            const totalRestantes = tableauTaches.length - totalFaites;
+
+            txtRestantes.textContent = totalRestantes;
+            txtFaites.textContent = totalFaites;
+        }
+
+        function sauvegarderDansLocalStorage() {
+            localStorage.setItem('mesTaches', JSON.stringify(tableauTaches));
+        }
+    </script>
+</body>
+</html>

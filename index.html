@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stride +</title>
+    <title>Stride</title>
     <link rel="icon" type="image/svg" href="icon-t.svg">
     <style>
         body {
@@ -427,24 +427,19 @@
         });
 
         btnAjouter.addEventListener('click', () => {
-    // Vérification de la limite de 5 tâches
-    if (tableauTaches.length >= 5) {
-        alert("Limite atteinte ! Vous ne pouvez pas ajouter plus de 5 tâches dans la version gratuite. Passez à la version Premium pour un accès illimité.");
-        return; // Bloque la suite de l'exécution
-    }
+            const texteTache = prompt("Quelle tâche souhaitez-vous ajouter ?");
 
-    const texteTache = prompt("Quelle tâche souhaitez-vous ajouter ?");
+            if (texteTache && texteTache.trim() !== "") {
+                const textePropre = texteTache.trim();
+                
+                creerElementTacheHTML(textePropre, false);
+                tableauTaches.push({ texte: textePropre, coche: false });
+                
+                sauvegarderDansLocalStorage();
+                mettreAJourStats();
+            }
+        });
 
-    if (texteTache && texteTache.trim() !== "") {
-        const textePropre = texteTache.trim();
-        
-        creerElementTacheHTML(textePropre, false);
-        tableauTaches.push({ texte: textePropre, coche: false });
-        
-        sauvegarderDansLocalStorage();
-        mettreAJourStats();
-    }
-});
         function creerElementTacheHTML(texte, estCoche) {
             const li = document.createElement('li');
             li.classList.add('task-item');
